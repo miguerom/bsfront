@@ -8,9 +8,8 @@ declare module 'yup' {
 
 import * as yup from 'yup';
 
-import type { AdButlerConfig } from '../../../types/client/adButlerConfig';
-import { SUPPORTED_AD_TEXT_PROVIDERS, SUPPORTED_AD_BANNER_PROVIDERS } from '../../../types/client/adProviders';
-import type { AdTextProviders, AdBannerProviders } from '../../../types/client/adProviders';
+import type { AdButlerConfig, AdTextProviders, AdBannerProviders, AdCustomBannerConfig } from '../../../types/client/ad';
+import { SUPPORTED_AD_TEXT_PROVIDERS, SUPPORTED_AD_BANNER_PROVIDERS } from '../../../types/client/ad';
 import type { MarketplaceAppOverview } from '../../../types/client/marketplace';
 import type { NavItemExternal } from '../../../types/client/navigation-items';
 import type { BridgedTokenChain, TokenBridge } from '../../../types/client/token';
@@ -133,12 +132,45 @@ const adButlerConfigSchema = yup
       .required(),
   });
 
+const adCustomBannerConfigSchema: yup.ObjectSchema<AdCustomBannerConfig> = yup
+  .object()
+  .shape({
+    text: yup.string(),
+    url: yup.string().test(urlTest),
+    desktopImageUrl: yup.string().test(urlTest).required(),
+    mobileImageUrl: yup.string().test(urlTest).required(),
+  });
+
+const adCustomConfigSchema = yup
+  .object()
+  .shape({
+    banners: yup
+      .array()
+      .of(adCustomBannerConfigSchema)
+      .min(1, 'Banners array cannot be empty')
+      .required(),
+    interval: yup.number().positive(),
+    randomStart: yup.boolean(),
+    randomNextAd: yup.boolean(),
+  })
+  .when('NEXT_PUBLIC_AD_BANNER_PROVIDER', {
+    is: (value: AdBannerProviders) => value === 'custom',
+    then: (schema) => schema,
+    otherwise: (schema) =>
+      schema.test(
+        'custom-validation',
+        'NEXT_PUBLIC_AD_CUSTOM_CONFIG_URL cannot not be used without NEXT_PUBLIC_AD_BANNER_PROVIDER being set to "custom"',
+        () => false,
+      ),
+  });
+
 const adsBannerSchema = yup
   .object()
   .shape({
     NEXT_PUBLIC_AD_BANNER_PROVIDER: yup.string<AdBannerProviders>().oneOf(SUPPORTED_AD_BANNER_PROVIDERS),
     NEXT_PUBLIC_AD_ADBUTLER_CONFIG_DESKTOP: adButlerConfigSchema,
     NEXT_PUBLIC_AD_ADBUTLER_CONFIG_MOBILE: adButlerConfigSchema,
+    NEXT_PUBLIC_AD_CUSTOM_CONFIG_URL: adCustomConfigSchema,
   });
 
 const sentrySchema = yup
