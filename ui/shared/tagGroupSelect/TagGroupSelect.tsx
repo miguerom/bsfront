@@ -2,7 +2,7 @@ import { HStack, Tag, chakra } from '@chakra-ui/react';
 import React from 'react';
 
 type Props = {
-  items: Array<string>;
+  items: Array<{ id: string; title: string }>;
   defaultValue: string | Array<string>;
   isMulti?: boolean;
   onChange: (value: Array<string>) => void;
@@ -34,17 +34,17 @@ const TagGroupSelect = ({ items, defaultValue, isMulti, onChange, className }: P
   return (
     <HStack className={ className }>
       { items.map(item => {
-        const isActive = value.includes(item);
+        const isActive = value.includes(item.id);
         return (
           <Tag
-            key={ item }
-            data-id={ item }
+            key={ item.id }
+            data-id={ item.id }
             variant={ isActive ? 'selectActive' : 'select' }
             fontWeight={ 500 }
             cursor="pointer"
             onClick={ onItemClick }
           >
-            { item }
+            { item.title }
           </Tag>
         );
       }) }
