@@ -1,40 +1,40 @@
-import { HStack, Tag, chakra } from '@chakra-ui/react';
+import { HStack, Tag } from '@chakra-ui/react';
 import React from 'react';
 
-type Props = {
-  items: Array<{ id: string; title: string }>;
-  defaultValue: string | Array<string>;
-  isMulti?: boolean;
-  onChange: (value: Array<string>) => void;
-  className?: string;
-}
+type Props<T extends string> = {
+  items: Array<{ id: T; title: string }>;
+} & (
+  {
+    value: T;
+    onChange: (value: T) => void;
+    isMulti?: false;
+  } | {
+    value: Array<T>;
+    onChange: (value: Array<T>) => void;
+    isMulti: true;
+  }
+)
 
-const TagGroupSelect = ({ items, defaultValue, isMulti, onChange, className }: Props) => {
-  const [ value, setValue ] = React.useState<Array<string>>(Array.isArray(defaultValue) ? defaultValue : [ defaultValue ]);
-
+const TagGroupSelect = <T extends string>({ items, value, isMulti, onChange }: Props<T>) => {
   const onItemClick = React.useCallback((event: React.SyntheticEvent) => {
-    const itemValue = (event.currentTarget as HTMLDivElement).getAttribute('data-id') as string;
-    setValue((prevValue) => {
+    const itemValue = (event.currentTarget as HTMLDivElement).getAttribute('data-id') as T;
+    if (isMulti) {
       let newValue;
-      if (isMulti) {
-        if (prevValue.includes(itemValue)) {
-          newValue = prevValue.filter(i => i !== itemValue);
-        } else {
-          newValue = [ ...prevValue, itemValue ];
-        }
+      if (value.includes(itemValue)) {
+        newValue = value.filter(i => i !== itemValue);
       } else {
-        newValue = [ itemValue ];
+        newValue = [ ...value, itemValue ];
       }
       onChange(newValue);
-      return newValue;
-    });
-
-  }, [ isMulti, onChange ]);
+    } else {
+      onChange(itemValue);
+    }
+  }, [ isMulti, onChange, value ]);
 
   return (
-    <HStack className={ className }>
+    <HStack>
       { items.map(item => {
-        const isActive = value.includes(item.id);
+        const isActive = isMulti ? value.includes(item.id) : value === item.id;
         return (
           <Tag
             key={ item.id }
@@ -52,4 +52,4 @@ const TagGroupSelect = ({ items, defaultValue, isMulti, onChange, className }: P
   );
 };
 
-export default chakra(TagGroupSelect);
+export default TagGroupSelect;

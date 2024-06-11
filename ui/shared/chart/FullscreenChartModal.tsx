@@ -5,7 +5,7 @@ import type { TimeChartItem } from './types';
 
 import IconSvg from 'ui/shared/IconSvg';
 
-import ChartWidgetGraph from './ChartWidgetGraph';
+import ChartWidgetContent from './ChartWidgetContent';
 
 type Props = {
   isOpen: boolean;
@@ -91,13 +91,13 @@ const FullscreenChartModal = ({
 
         <ModalBody
           h="100%"
+          margin={{ bottom: 60 }}
         >
-          <ChartWidgetGraph
-            margin={{ bottom: 60 }}
+          <ChartWidgetContent
             isEnlarged
             items={ items }
             units={ units }
-            onZoom={ handleZoom }
+            handleZoom={ handleZoom }
             isZoomResetInitial={ isZoomResetInitial }
             title={ title }
           />

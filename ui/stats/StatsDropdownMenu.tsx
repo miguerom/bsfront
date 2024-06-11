@@ -22,7 +22,7 @@ export function StatsDropdownMenu<T extends string>({ items, selectedId, onSelec
     >
       <MenuButton
         as={ Button }
-        size="md"
+        size="sm"
         variant="outline"
         colorScheme="gray"
         w="100%"

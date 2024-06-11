@@ -20,9 +20,9 @@ const variants = {
   select: definePartsStyle((props) => ({
     container: {
       bg: mode('gray.100', 'gray.800')(props),
-      color: 'text_secondary',
+      color: mode('gray.500', 'whiteAlpha.800')(props),
       _hover: {
-        color: 'link',
+        color: 'blue.400',
         opacity: 0.76,
       },
     },
